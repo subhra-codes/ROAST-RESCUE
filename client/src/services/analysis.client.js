@@ -97,7 +97,7 @@ async function apiJson(pathname, options = {}) {
 export async function getProfileAnalysis(username) {
   const clean = String(username || '').trim();
   if (!clean) throw new Error('GitHub username is required.');
-  return apiJson(`/api/analysis/${encodeURIComponent(clean)}`);
+  return apiJson(`/analysis/${encodeURIComponent(clean)}`);
 }
 
 export async function compareProfiles(user1, user2) {
@@ -106,7 +106,7 @@ export async function compareProfiles(user1, user2) {
     throw new Error('Choose a different GitHub profile to compare against your own.');
   }
 
-  return apiJson(`/api/compare?user1=${encodeURIComponent(user1)}&user2=${encodeURIComponent(user2)}`);
+  return apiJson(`/compare?user1=${encodeURIComponent(user1)}&user2=${encodeURIComponent(user2)}`);
 }
 
 /*
