@@ -1,5 +1,7 @@
 import express from 'express';
 import path from 'node:path';
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -33,7 +35,21 @@ app.use('/api', analysisRoutes);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const clientDist = path.resolve(__dirname, '../client/dist');
+const projectRoot = path.resolve(__dirname, '..');
+const clientDist = path.resolve(projectRoot, 'client/dist');
+const clientIndex = path.join(clientDist, 'index.html');
+
+// AI Studio may start the Express entrypoint directly instead of running the
+// root npm build script first. Build the existing React app on startup when
+// the production bundle is missing. This changes no UI or project structure.
+if (!fs.existsSync(clientIndex)) {
+  console.log('Client production build not found. Building client...');
+  execFileSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', 'build'], {
+    cwd: projectRoot,
+    stdio: 'inherit',
+  });
+}
+
 app.use(express.static(clientDist));
 
 app.get(/^(?!\/api(?:\/|$)).*/, (req, res) => {
