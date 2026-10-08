@@ -6,7 +6,7 @@
   "scripts": {
     "build": "vite build --config client/vite.config.js",
     "start": "node server/server.js",
-    "dev": "concurrently -k \"node server/server.js\" \"vite client --config client/vite.config.js\""
+    "dev": "npm run build && node server/server.js"
   },
   "dependencies": {
     "@react-three/fiber": "^9.3.0",

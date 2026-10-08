@@ -1,0 +1,8 @@
+{
+  "name": "ROAST / RESCUE",
+  "description": "GitHub Career Intelligence — brutal repo teardowns and recruiter-grade turnaround plans.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
