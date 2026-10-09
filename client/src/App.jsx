@@ -318,7 +318,10 @@ export default function App() {
         />
 
         {/* Page 9: Interview Pressure Test */}
-        <InterviewTest interviewData={interviewData} user={userObj} />
+
+        <div id="interview-test">
+          <InterviewTest interviewData={interviewData} user={userObj} />
+        </div>
 
         <footer className="report-footer">
           <div className="rr-brand-foot">
