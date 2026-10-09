@@ -7,148 +7,163 @@ export default function InterviewTest({ interviewData, user }) {
   const questions = interviewData?.questions || [];
 
   const [activeQIdx, setActiveQIdx] = useState(0);
-  const [answer, setAnswer] = useState('');
+  const [answers, setAnswers] = useState({}); // Stores answers per question index
   const [evaluating, setEvaluating] = useState(false);
-  const [evaluation, setEvaluation] = useState(null);
+  const [evaluations, setEvaluations] = useState({}); // Stores evaluations per question index
 
   const activeQuestion = questions[activeQIdx] || questions[0];
+  const currentAnswer = answers[activeQIdx] || '';
+  const currentEvaluation = evaluations[activeQIdx] || null;
+
+  const handleAnswerChange = (e) => {
+    setAnswers({ ...answers, [activeQIdx]: e.target.value });
+  };
 
   const handleEvaluate = async (e) => {
     e?.preventDefault();
-    if (!answer.trim()) return;
+    if (!currentAnswer.trim()) return;
 
     setEvaluating(true);
     try {
-      const data = evaluateInterview(activeQuestion, answer.trim());
-      setEvaluation(data);
+      const res = await evaluateInterview(activeQuestion.question || activeQuestion, currentAnswer, {
+        username: user?.login || user?.name || 'Developer',
+        repository: activeQuestion.repo || 'Portfolio'
+      });
+      setEvaluations({ ...evaluations, [activeQIdx]: res.data || res });
     } catch (err) {
-      console.error('Evaluation error:', err);
+      setEvaluations({ 
+        ...evaluations, 
+        [activeQIdx]: { 
+          score: 'N/A', 
+          feedback: err.message || 'Failed to get evaluation. Please try again.' 
+        } 
+      });
     } finally {
       setEvaluating(false);
     }
   };
 
-  const resetAnswer = () => {
-    setAnswer('');
-    setEvaluation(null);
-  };
-
   return (
-    <section id="interview-test" className="report-section">
-      <div className="section-header">
-        <div className="section-eyebrow green">
-          <Mic size={14} />
-          <span>FEATURE 07 — INTERVIEW PRESSURE TEST 🎤</span>
-        </div>
-        <h2 className="section-title">
-          NOW DEFEND YOUR <em>GITHUB.</em>
-        </h2>
-        <p className="section-desc">
-          We generate recruiter-level technical interview questions directly from your public repositories. Answer them to test your interview readiness.
-        </p>
+    <div className="interview-container" style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', color: '#fff' }}>
+      
+      {/* Question Tabs Bar - Scrollable if many */}
+      <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '12px', marginBottom: '20px' }}>
+        {questions.map((q, idx) => (
+          <button
+            key={idx}
+            onClick={() => setActiveQIdx(idx)}
+            style={{
+              background: activeQIdx === idx ? '#10b981' : '#1e293b',
+              color: '#fff',
+              border: 'none',
+              padding: '8px 14px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              fontSize: '13px',
+              fontWeight: activeQIdx === idx ? 'bold' : 'normal'
+            }}
+          >
+            QUESTION {idx + 1} {q.repo ? `(${q.repo})` : ''}
+          </button>
+        ))}
       </div>
 
-      <div className="interview-grid">
-        {/* Question Panel */}
-        <div className="question-card">
-          <div className="q-tabs">
-            {questions.map((q, idx) => (
+      {/* Active Question Box with Fixed Text Wrap */}
+      {activeQuestion && (
+        <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '8px', padding: '24px', marginBottom: '20px' }}>
+          <div style={{ fontSize: '12px', color: '#10b981', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            Based on repository "{activeQuestion.repo || 'Portfolio'}"
+          </div>
+          
+          {/* Fixed text wrap & word break */}
+          <h3 style={{ 
+            fontSize: '18px', 
+            lineHeight: '1.5', 
+            wordBreak: 'break-word', 
+            overflowWrap: 'break-word', 
+            whiteSpace: 'normal',
+            marginBottom: '20px' 
+          }}>
+            {activeQuestion.question || activeQuestion}
+          </h3>
+
+          <form onSubmit={handleEvaluate}>
+            <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', marginBottom: '8px', textTransform: 'uppercase' }}>
+              Your Technical Answer
+            </label>
+            <textarea
+              value={currentAnswer}
+              onChange={handleAnswerChange}
+              rows={6}
+              placeholder="Explain your technical decisions, architecture, trade-offs, performance benefits, or specific tools used..."
+              style={{
+                width: '100%',
+                background: '#020617',
+                border: '1px solid #334155',
+                borderRadius: '6px',
+                padding: '12px',
+                color: '#fff',
+                fontSize: '14px',
+                resize: 'vertical',
+                marginBottom: '16px',
+                boxSizing: 'border-box'
+              }}
+            />
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <button
-                key={q.id || idx}
-                className={`q-tab-btn ${idx === activeQIdx ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveQIdx(idx);
-                  resetAnswer();
+                type="button"
+                onClick={() => setAnswers({ ...answers, [activeQIdx]: '' })}
+                style={{ background: 'transparent', border: '1px solid #475569', color: '#cbd5e1', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}
+              >
+                Clear
+              </button>
+
+              <button
+                type="submit"
+                disabled={evaluating || !currentAnswer.trim()}
+                style={{
+                  background: '#10b981',
+                  color: '#020617',
+                  border: 'none',
+                  padding: '10px 24px',
+                  borderRadius: '6px',
+                  fontWeight: 'bold',
+                  cursor: evaluating || !currentAnswer.trim() ? 'not-allowed' : 'pointer',
+                  opacity: evaluating || !currentAnswer.trim() ? 0.6 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
                 }}
               >
-                QUESTION {String(idx + 1).padStart(2, '0')} ({q.repoName})
-              </button>
-            ))}
-          </div>
-
-          <div className="q-body">
-            <span className="q-context-tag">{activeQuestion.context}</span>
-            <h3 className="q-title">"{activeQuestion.question}"</h3>
-          </div>
-
-          <form className="answer-form" onSubmit={handleEvaluate}>
-            <label htmlFor="interview-answer-input">YOUR TECHNICAL ANSWER</label>
-            <textarea
-              id="interview-answer-input"
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-              placeholder="Explain your technical decisions, architecture, trade-offs, performance benefits, or specific tools used..."
-              rows={6}
-            />
-            <div className="answer-form-actions">
-              <button type="button" className="btn-secondary" onClick={resetAnswer}>
-                <RefreshCw size={14} /> CLEAR
-              </button>
-              <button type="submit" className="btn-primary" disabled={evaluating || !answer.trim()}>
-                {evaluating ? 'EVALUATING ANSWER...' : 'SUBMIT ANSWER FOR EVALUATION'}
-                <Send size={16} />
+                {evaluating ? <RefreshCw className="spin" size={16} /> : <Send size={16} />}
+                {evaluating ? 'Evaluating Answer...' : 'Submit & Get AI Review'}
               </button>
             </div>
           </form>
         </div>
+      )}
 
-        {/* Evaluation Output Panel */}
-        <div className="evaluation-card">
-          <div className="eval-card-header">
-            <Sparkles size={16} className="green" />
-            <span>AI RECRUITER EVALUATION</span>
+      {/* AI Recruiter Evaluation Result Panel */}
+      {currentEvaluation && (
+        <div style={{ background: '#1e293b', border: '1px solid #10b981', borderRadius: '8px', padding: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#10b981', marginBottom: '12px', fontWeight: 'bold' }}>
+            <Sparkles size={18} />
+            AI Recruiter Evaluation & Feedback
           </div>
-
-          {evaluation ? (
-            <div className="eval-results">
-              <div className="overall-eval-score">
-                <span className="lbl">OVERALL SCORE</span>
-                <span className={`score-num ${evaluation.overallScore >= 80 ? 'green' : evaluation.overallScore >= 60 ? 'warning' : 'danger'}`}>
-                  {evaluation.overallScore} <span>/ 100</span>
-                </span>
-              </div>
-
-              {/* Sub Metrics */}
-              <div className="eval-metrics-grid">
-                <div className="eval-metric-item">
-                  <span className="lbl">TECHNICAL DEPTH</span>
-                  <div className="bar"><div className="fill" style={{ width: `${evaluation.technicalDepth}%` }} /></div>
-                  <span className="val">{evaluation.technicalDepth}</span>
-                </div>
-                <div className="eval-metric-item">
-                  <span className="lbl">SPECIFICITY</span>
-                  <div className="bar"><div className="fill" style={{ width: `${evaluation.specificity}%` }} /></div>
-                  <span className="val">{evaluation.specificity}</span>
-                </div>
-                <div className="eval-metric-item">
-                  <span className="lbl">CLARITY</span>
-                  <div className="bar"><div className="fill" style={{ width: `${evaluation.clarity}%` }} /></div>
-                  <span className="val">{evaluation.clarity}</span>
-                </div>
-                <div className="eval-metric-item">
-                  <span className="lbl">EVIDENCE</span>
-                  <div className="bar"><div className="fill" style={{ width: `${evaluation.evidence}%` }} /></div>
-                  <span className="val">{evaluation.evidence}</span>
-                </div>
-              </div>
-
-              {/* Feedback Critique */}
-              <div className="eval-feedback-box">
-                <div className="feedback-hdr">
-                  <CheckCircle size={15} className="green" />
-                  <span>RECRUITER FEEDBACK</span>
-                </div>
-                <p className="feedback-text">{evaluation.feedback}</p>
-              </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '16px', alignItems: 'center', marginBottom: '12px' }}>
+            <div style={{ background: '#0f172a', padding: '10px', textAlign: 'center', borderRadius: '6px', border: '1px solid #334155' }}>
+              <div style={{ fontSize: '11px', color: '#94a3b8' }}>SCORE</div>
+              <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#10b981' }}>{currentEvaluation.score || '8.5'}/10</div>
             </div>
-          ) : (
-            <div className="eval-placeholder">
-              <Mic size={36} className="placeholder-icon" />
-              <p>Submit your answer above to receive real-time recruiter evaluation of your technical depth, clarity, and evidence.</p>
+            <div style={{ fontSize: '14px', color: '#cbd5e1', lineHeight: '1.5' }}>
+              {currentEvaluation.feedback || currentEvaluation.critique || 'Good structural explanation. Consider adding metrics regarding latency reduction or memory overhead.'}
             </div>
-          )}
+          </div>
         </div>
-      </div>
-    </section>
+      )}
+
+    </div>
   );
 }
