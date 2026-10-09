@@ -282,20 +282,24 @@ h1 em {
 }
 
 .signal-activity { right: 12%; top: 19%; }
-.signal-projects { left: 2%; top: 31%; }
+.signal-projects { left: 14%; top: 31%; }
 .signal-docs { right: 2%; top: 35%; }
-.signal-tech { left: 1%; top: 55%; }
+.signal-tech { left: 13%; top: 55%; }
 .signal-contributions { right: 3%; top: 57%; }
 .signal-impact { right: 13%; top: 72%; }
+
 
 /* Project and technology callouts visually originate from the DNA structure. */
 .signal-projects .signal-line,
 .signal-tech .signal-line {
-  order: 2;
-  margin-left: 12px;
-  margin-right: 0;
-  width: 92px;
-  transform-origin: right center;
+  order: 0;
+  display: inline-block;
+  flex-shrink: 0;
+  width: 64px;
+  height: 1px;
+  margin: 0 12px 0 0;
+  background: var(--green);
+  opacity: .72;
   box-shadow: 0 0 8px rgba(124, 255, 107, .12);
 }
 

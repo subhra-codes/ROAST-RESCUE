@@ -256,7 +256,24 @@ export default function App() {
         {/* Sticky Report Topbar */}
         <header className="report-sticky-topbar">
           <div className="brand" onClick={() => setScreen('landing')} style={{ cursor: 'pointer' }}>
-            <span className="rr">R<span>/</span>R</span>
+            <div 
+              className="brand" 
+              onClick={() => setScreen('landing')} 
+              style={{ 
+              cursor: 'pointer', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '6px', 
+              fontFamily: 'monospace',
+              fontWeight: '900',
+              fontSize: '18px',
+              letterSpacing: '1.5px'
+        }}
+      >
+            <span style={{ color: '#ffffff' }}>DEV</span>
+            <span style={{ color: '#10b981', margin: '0 -2px' }}>//</span>
+            <span style={{ color: '#ffffff' }}>SIGNAL</span>
+          </div>
             <span className="header-divider" />
             <span className="brand-name">CAREER INTELLIGENCE REPORT</span>
           </div>
