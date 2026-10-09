@@ -39,3 +39,9 @@ export async function compareProfiles(user1, user2) {
 
   return apiJson(`/api/compare?user1=${encodeURIComponent(user1)}&user2=${encodeURIComponent(user2)}`);
 }
+export async function evaluateInterview(question, answer, userContext = {}) {
+  return apiJson('/api/interview/evaluate', {
+    method: 'POST',
+    body: JSON.stringify({ question, answer, userContext }),
+  });
+}
