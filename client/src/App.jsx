@@ -325,7 +325,7 @@ export default function App() {
 
         <footer className="report-footer">
           <div className="rr-brand-foot">
-            <span className="rr">R<span>/</span>R</span>
+            
             <span>ROAST / RESCUE — GITHUB CAREER INTELLIGENCE</span>
           </div>
           <button className="scroll-top-btn" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
@@ -340,7 +340,7 @@ export default function App() {
     <main className="page">
       <header className="topbar">
         <div className="brand">
-          <span className="rr">R<span>/</span>R</span>
+          
           <span className="header-divider" />
           <span className="brand-name">GITHUB CAREER INTELLIGENCE</span>
         </div>

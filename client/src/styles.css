@@ -282,9 +282,9 @@ h1 em {
 }
 
 .signal-activity { right: 12%; top: 19%; }
-.signal-projects { left: 7%; top: 31%; }
+.signal-projects { left: 2%; top: 31%; }
 .signal-docs { right: 2%; top: 35%; }
-.signal-tech { left: 3%; top: 55%; }
+.signal-tech { left: 1%; top: 55%; }
 .signal-contributions { right: 3%; top: 57%; }
 .signal-impact { right: 13%; top: 72%; }
 
